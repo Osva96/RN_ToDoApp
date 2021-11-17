@@ -7,14 +7,19 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Button,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { addProfile, updateProfile } from '../store/profileSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 
-const Profile = ({ route }) => {
+const Profile = ({ route, navigation }) => {
   const [phone, setPhone] = React.useState(null);
   const [description, setDescription] = React.useState('');
   const [resourcePath, setResourcePath] = React.useState({});
+
+  const dispatch = useDispatch();
 
   const selectFile = () => {
     let options = {
@@ -45,15 +50,32 @@ const Profile = ({ route }) => {
     });
   };
 
+  const handleSave = () => {
+    const profileId = 1;
+    const newProfile = {
+      id: profileId,
+      phone: phone,
+      description: description,
+      image: resourcePath.uri,
+    };
+    console.log('Profile: ', newProfile);
+    alert(JSON.stringify(newProfile));
+    // dispatch(addProfile(newProfile));
+    // navigation.goBack();
+  };
+
   return (
     <ScrollView>
+
       <Box position="relative" w="100%" h={200}>
         <Image source={{ uri: resourcePath.uri }} style={styles.image} />
         <TouchableOpacity onPress={selectFile} style={styles.button}  >
           <AddIcon size="4" color="white" />
         </TouchableOpacity>
       </Box>
+
       <Text style={styles.title}>{route.params.name}</Text>
+
       <Text style={styles.caption}>Phone</Text>
       <TextInput
         style={styles.input}
@@ -62,6 +84,7 @@ const Profile = ({ route }) => {
         placeholder="Phone number"
         keyboardType="numeric"
       />
+
       <Text style={styles.caption}>Description</Text>
       <TextInput
         style={styles.input}
@@ -69,6 +92,11 @@ const Profile = ({ route }) => {
         value={description}
         placeholder="Something about you"
       />
+
+      <Button onPress={handleSave} title="Update">
+          Update
+      </Button>
+
     </ScrollView>
   );
 };

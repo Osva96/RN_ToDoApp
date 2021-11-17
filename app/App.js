@@ -14,23 +14,34 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   return (
     <Provider store={store}>
+
       <NativeBaseProvider>
         <NavigationContainer>
+
           <Stack.Navigator>
+
             <Stack.Screen
               name="Home"
               component={Home}
               options={{ title: 'Home' }}
             />
-            <Stack.Screen name="Profile" component={Profile} />
+
+            <Stack.Screen
+            name="Profile"
+            component={Profile}
+            />
+
             <Stack.Screen
               name="Details"
               component={NoteDetails}
               options={{ title: 'Note Details' }}
             />
+
           </Stack.Navigator>
+
         </NavigationContainer>
       </NativeBaseProvider>
+
     </Provider>
   );
 };

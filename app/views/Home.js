@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Button,
   FlatList,
@@ -36,7 +36,7 @@ const Home = ({ navigation }) => {
       <Button
         title="Go to profile"
         onPress={() =>
-          navigation.navigate('Profile', { name: 'Jona' })
+          navigation.navigate('Profile', { name: 'Osvaldo' })
         }
       />
       <Text style={styles.title}>Welcome to Notes!</Text>

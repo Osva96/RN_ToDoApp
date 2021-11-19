@@ -1,5 +1,5 @@
 import { AddIcon, Box } from 'native-base';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Image,
   ScrollView,
@@ -10,16 +10,29 @@ import {
   Button,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { addProfile, updateProfile } from '../store/profileSlice';
-import { useDispatch, useSelector } from 'react-redux';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = ({ route, navigation }) => {
-  const [phone, setPhone] = React.useState(null);
-  const [description, setDescription] = React.useState('');
-  const [resourcePath, setResourcePath] = React.useState({});
 
-  const dispatch = useDispatch();
+  const [flagImg, setFlagImg] = React.useState(false);
+
+  const selectedProfile = route.params?.profileValues;
+  // console.log('SELECTEDPROFILE: ', selectedProfile);
+
+  const [phone, setPhone] = React.useState(selectedProfile ? selectedProfile.phone : '');
+  const [description, setDescription] = React.useState(selectedProfile ? selectedProfile.description : '');
+  const [resourcePath, setResourcePath] = React.useState(selectedProfile ? selectedProfile.uri : {});
+
+  const optionFlag = () => {
+    if (selectedProfile) {
+      setFlagImg(res => true);
+      console.log('flag is true');
+    } else {
+      setFlagImg(res => false);
+      console.log('flag is false');
+    }
+  };
 
   const selectFile = () => {
     let options = {
@@ -37,44 +50,63 @@ const Profile = ({ route, navigation }) => {
     };
 
     launchImageLibrary(options, res => {
-      console.log('Response = ', res);
+      // console.log('Response = ', res);
 
       if (res.didCancel) {
         console.log('User cancelled image picker');
       } else if (res.error) {
         console.log('ImagePicker Error: ', res.error);
       } else {
-        let source = res.assets[0];
+        let source = res.assets[0].uri;
+        // console.log('launchImageLibrary SOURCE', source);
         setResourcePath(prev => source);
+        // setFlagImg(data => false);
       }
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const profileId = 1;
     const newProfile = {
       id: profileId,
       phone: phone,
       description: description,
-      image: resourcePath.uri,
+      uri: resourcePath,
     };
-    console.log('Profile: ', newProfile);
-    alert(JSON.stringify(newProfile));
-    // dispatch(addProfile(newProfile));
-    // navigation.goBack();
+    let storeStringData = JSON.stringify(newProfile);
+
+    try {
+      await AsyncStorage.setItem('@profileUser', storeStringData);
+    } catch (err) {
+      console.log('Error in setItem: ', err);
+    }
+
+    navigation.goBack();
   };
+
+  useEffect(() => { optionFlag(); });
 
   return (
     <ScrollView>
 
-      <Box position="relative" w="100%" h={200}>
-        <Image source={{ uri: resourcePath.uri }} style={styles.image} />
-        <TouchableOpacity onPress={selectFile} style={styles.button}  >
-          <AddIcon size="4" color="white" />
-        </TouchableOpacity>
-      </Box>
+      {
+        flagImg === true ?
+        <Box position="relative" w="100%" h={200}>
+          <Image source={{ uri: resourcePath }} style={styles.image} />
+          <TouchableOpacity onPress={selectFile} style={styles.button}  >
+            <AddIcon size="4" color="white" />
+          </TouchableOpacity>
+        </Box> :
+        <Box position="relative" w="100%" h={200}>
+          <Image source={{ uri: resourcePath.uri }} style={styles.image} />
+          <TouchableOpacity onPress={selectFile} style={styles.button}  >
+            <AddIcon size="4" color="white" />
+          </TouchableOpacity>
+        </Box>
+      }
 
-      <Text style={styles.title}>{route.params.name}</Text>
+      {/* <Text style={styles.title}>{route.params.name}</Text> */}
+      <Text style={styles.title}>Osvaldo</Text>
 
       <Text style={styles.caption}>Phone</Text>
       <TextInput

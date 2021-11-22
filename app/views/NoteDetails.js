@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import { Button } from 'native-base';
-import { addNote } from '../store/noteSlice';
+import { addNote, updateNote } from '../store/noteSlice';
 
 
 const NoteDetails = ({ navigation, route }) => {
@@ -18,9 +18,7 @@ const NoteDetails = ({ navigation, route }) => {
   const [text, setText] = useState(selectedNote ? selectedNote.text : '');
 
   const handleSave = () => {
-    const newNoteId = !!notes.length
-      ? notes[notes.length - 1].id + 1
-      : 1;
+    const newNoteId = !!notes.length ? notes[notes.length - 1].id + 1 : 1;
     const newNote = {
       id: newNoteId,
       title: title,
@@ -28,6 +26,20 @@ const NoteDetails = ({ navigation, route }) => {
     };
     console.log('note', newNote, text);
     dispatch(addNote(newNote));
+    navigation.goBack();
+  };
+
+  const handleUpdate = () => {
+    console.log(selectedNote);
+    const noteIdPass = selectedNote.id;
+    const newInfoNote = {
+      id: noteIdPass,
+      title: title,
+      text: text,
+    };
+
+    console.log('Note: ', newInfoNote);
+    dispatch(updateNote(newInfoNote));
     navigation.goBack();
   };
 
@@ -50,10 +62,21 @@ const NoteDetails = ({ navigation, route }) => {
         numberOfLines={10}
         placeholder="Write anything here"
       />
-      <Button
-        style={styles.btn}
-        onPress={handleSave}
-      >Save</Button>
+      {
+        selectedNote ?
+        <Button
+          style={styles.btn}
+          onPress={handleUpdate}
+        >
+          Update
+        </Button> :
+        <Button
+          style={styles.btn}
+          onPress={handleSave}
+        >
+          Save
+        </Button>
+      }
     </View>
 
   );

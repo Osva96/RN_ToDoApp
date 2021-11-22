@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import {
-  Button,
   FlatList,
   Image,
   StyleSheet,
@@ -10,18 +9,15 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import ListItem from '../components/ListItem';
 import { removeNote } from '../store/noteSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-/**
- * NOTE
- * id: int
- * title: string
- * text: string
- */
+import { Button, Icon } from 'native-base';
+// import { Ionicons } from '@expo/vector-icons';
 
 const Home = ({ navigation }) => {
   const { notes } = useSelector(state => state.notes);
   const dispatch = useDispatch();
+  var profileValues;
 
   const deleteNote = (noteId) => {
     dispatch(removeNote(noteId));
@@ -31,22 +27,49 @@ const Home = ({ navigation }) => {
     navigation.navigate('Details', { note: note });
   };
 
+  const showProfileData = async () => {
+    try {
+      const profileValue = await AsyncStorage.getItem('@profileUser');
+      if (profileValue !== null) {
+        profileValues = JSON.parse(profileValue);
+        // console.log('Home profile: ', profileValues);
+      } else {
+        // console.log('Esta vacío.');
+      }
+      navigation.navigate('Profile', { profileValues });
+    } catch (err) {
+      console.log('Error in: ', err);
+    }
+  };
+
+  // useEffect(() => { showProfileData(); });
+
   return (
     <View style={styles.container}>
-      <Button
-        title="Go to profile"
-        onPress={() =>
-          navigation.navigate('Profile', { name: 'Jona' })
-        }
-      />
+
       <Text style={styles.title}>Welcome to Notes!</Text>
-      <Image source={{ uri: 'https://picsum.photos/200' }} style={styles.image} />
+
+      {/* <Image source={{ uri: 'https://picsum.photos/200' }} style={styles.image} /> */}
+
       <Button
-        title="Add Note"
+        style={styles.buttonProfile}
+        size="lg"
+        onPress={() =>
+          showProfileData()
+        }
+      >
+        Go to profile
+      </Button>
+
+      <Button
+        style={styles.buttonNote}
+        size="lg"
         onPress={() =>
           navigation.navigate('Details')
         }
-      />
+      >
+        Add note
+      </Button>
       <View style={styles.listContainer}>
         <FlatList
           data={notes}
@@ -57,6 +80,7 @@ const Home = ({ navigation }) => {
           />}
         />
       </View>
+
     </View>
   );
 };
@@ -73,6 +97,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#435460',
     textAlign: 'center',
+    marginBottom: 25,
   },
   image: {
     width: 100,
@@ -82,6 +107,20 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
+  },
+  buttonProfile: {
+    width: '95%',
+    borderRadius: 15,
+    marginBottom: 10,
+    alignSelf: 'center',
+    backgroundColor: 'darkblue',
+  },
+  buttonNote: {
+    width: '95%',
+    borderRadius: 15,
+    alignSelf: 'center',
+    marginBottom: 10,
+    backgroundColor: 'darkblue',
   },
 });
 

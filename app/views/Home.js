@@ -12,7 +12,7 @@ import { removeNote } from '../store/noteSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Button, Icon } from 'native-base';
-// import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 const Home = ({ navigation }) => {
   const { notes } = useSelector(state => state.notes);
